@@ -1,15 +1,16 @@
 module F4Tracker.Quest exposing (view, Model, init, Msg(..))
 
 import Color as Color exposing (rgb)
-import UI.Shared as Shared exposing (dim, vcenter)
-import UI.Layout exposing (Element, fromText, space, toHtml, spaceRight, spaceLeft,
-  onClick, cursor, Cursor(Pointer), auto, px, container, empty, center, lazy, stretch
-  , flowDown, flowRight)
-import UI.Text as Text exposing (bold, color, line, LineType(..), LineStyle(..), text, size)
+
+import Html exposing (div, span, text)
+import Html.Attributes exposing (style)
+import Html.Events exposing (onClick)
+
+import Styles.Flexbox exposing (row, column, vcenter, hcenter, width, height, margin, padding)
+import Styles.Text exposing (color, size, bold, line, LineType(..), LineStyle(..))
+
 import F4Tracker.Icons as Icons
 import F4Tracker.Models exposing (Quest, Status(..))
-
-import Debug
 
 type alias Model = {
   quest : Quest
@@ -24,18 +25,19 @@ init quest = {
 
 
 currentStatus =
-  fromText << color (rgb 50 50 50) << size 12
+  [ color (rgb 50 50 50), size 12 ]
 
 
 anyStatus quest status =
-  onClick (UpdateStatus quest status) << cursor Pointer << fromText << color (rgb 170 170 170) << size 12 << line Under Dashed
+  [ onClick (UpdateStatus quest status), style [ ( "cursor", "pointer" ) ], color (rgb 170 170 170), size 12, line Under Dashed ]
 
 
 statusToggle quest status name =
-  container auto auto stretch center
-    <| spaceLeft 8
-    <| (if quest.status == status then currentStatus else anyStatus quest status)
-    <| text name
+  let
+    attributes = if quest.status == status then currentStatus else anyStatus quest status
+  in
+    div ([ row, vcenter, padding 0 0 0 8 ] `List.append` attributes) [ text name ]
+
 
 statusSwitcher quest =
   [ statusToggle quest NotStarted "Not started"
@@ -44,38 +46,33 @@ statusSwitcher quest =
   ]
 
 view model =
-  let
-    view model =
-      -- Debug.log "quest" <| 
-      flowDown auto (px 35) [
-             flowRight auto auto
-              ([ spaceRight 6 <| icon model.quest
-              , spaceRight 10 <| fromText <| questLabel model.quest <| text model.quest.name
-              ]
-              `List.append`
-              statusSwitcher model.quest)
-      , space 2 0 0 22 <| fromText <| color (rgb 160 160 160) <| size 12 <| text model.quest.category
-      ]
-  in
-    lazy view model
+  div [ column, height 35 ] [
+    div [ row ] ([
+      div [ margin 0 6 0 0 ] [ icon model.quest ]
+    , div [ margin 0 10 0 0 ] [ span (questLabel model.quest) [ text model.quest.name ] ]
+    ] `List.append`
+      statusSwitcher model.quest
+    )
+    , div [ padding 2 0 0 22 ] [ span [ color (rgb 160 160 160), size 12 ] [ text model.quest.category ] ]
+  ]
 
 
 questLabel quest =
     case quest.status of
         NotStarted ->
-            identity
+            []
 
         InProgress ->
-            bold
+            [ bold ]
 
         Completed ->
-            color (rgb 102 102 102) << line Through Solid
+            [ color (rgb 102 102 102), line Through Solid ]
 
 
 icon quest =
     case quest.status of
         NotStarted ->
-            container (px 16) (px 16) center center <| empty
+            div [ row, vcenter, hcenter, width 16, height 16 ] [ ]
 
         InProgress ->
             Icons.circleONotch 16 (rgb 165 165 30)

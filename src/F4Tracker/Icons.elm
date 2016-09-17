@@ -1,19 +1,18 @@
 module F4Tracker.Icons exposing (search, circleONotch, check)
 
-import UI.Shared exposing (colorToCss)
 import Char
 import String
 
-import UI.Layout exposing (container, auto, px, center, fromText)
-import UI.Text as Text exposing (text, font)
+import Html exposing (div, text)
 
-icon char size color =
-  text (String.fromChar <| Char.fromCode char)
-  |> font "FontAwesome"
-  |> Text.size size
-  |> Text.color color
-  |> fromText
-  |> container (px size) (px size) center center
+import Styles.Flexbox exposing (row, vcenter, hcenter, width, height)
+import Styles.Text exposing (font, color, size)
+
+
+icon char textSize textColor =
+  div [ row, vcenter, hcenter, width textSize, height textSize, font "FontAwesome", size textSize, color textColor ] [
+    text (String.fromChar <| Char.fromCode char)
+  ]
 
 
 search =

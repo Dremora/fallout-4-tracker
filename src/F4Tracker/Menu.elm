@@ -1,7 +1,8 @@
 module F4Tracker.Menu exposing (view)
 
-import UI.Text as Text exposing (text, size, bold, weight)
-import UI.Layout exposing (auto, flowDown, fromText, space, spaceRight, spaceBottom)
+import Html exposing (div, span, text)
+import Styles.Text as Text exposing (size, bold, weight)
+import Styles.Flexbox exposing (row, column, padding, hcenter, width)
 
 
 data =
@@ -21,15 +22,18 @@ data =
 
 
 view =
-    flowDown auto auto (List.map section data)
+  div [ column ] (List.map section data)
 
 
 section model =
-    spaceBottom 10
-        <| flowDown auto auto
-        <| (spaceBottom 2 <| fromText (size 18 (bold (text model.label))))
-        :: List.map category model.categories
+  div [ column, padding 0 0 10 0 ]
+    <| (div [ column, padding 0 0 2 0 ] [
+      span [ size 18, bold ] [ text model.label ]
+    ])
+    :: List.map category model.categories
 
 
 category model =
-     space 4 0 0 10 <| fromText <| size 16 <| weight 200 <| text model.label
+  div [ column, padding 4 0 0 10 ] [
+    span [ size 16, weight 200 ] [ text model.label ]
+  ]

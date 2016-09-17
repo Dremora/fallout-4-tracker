@@ -5,42 +5,18 @@ import Color exposing (rgb)
 import Task
 import Html.App exposing (map)
 
-import UI.Shared
-    exposing
-        ( flowRight
-        , flowDown
-        , padding
-        , vcenter
-        , hcenter
-        , center
-        , vscroll
-        , borderBottom
-        , maxWidth
-        , fill
-        , viewport
-        , dim
-        )
-import UI.Input as Input
-import UI.Layout as Layout exposing (toHtml, lazy)
+import Html exposing (div, input)
+import Html.Events exposing (onInput)
+import Html.Attributes exposing (style, placeholder, value)
+
+import Styles.Flexbox exposing (row, vcenter, column, padding, margin, hcenter, width, height)
+import Styles.Input as Input
+import Styles.Text exposing (color, size)
+
 import F4Tracker.Quest as Quest
 import F4Tracker.Menu as Menu
 import F4Tracker.Icons as Icons
 import F4Tracker.Models as Models exposing (Status(..), saveQuest)
-
-
--- quests =
---     [ { id = 1, name = "War Never Changes", status = NotStarted }
---     , { id = 2, name = "Out of Time", status = NotStarted }
---     , { id = 3, name = "Jewel of the Commonwealth", status = NotStarted }
---     , { id = 4, name = "Unlikely Valentine", status = NotStarted }
---     , { id = 5, name = "Getting a Clue", status = InProgress }
---     , { id = 6, name = "Reunions", status = Completed }
---     , { id = 7, name = "Dangerous Minds", status = NotStarted }
---     , { id = 8, name = "The Glowing Sea", status = NotStarted }
---     , { id = 9, name = "Hunter/Hunted", status = NotStarted }
---     , { id = 10, name = "The Molecular Level", status = NotStarted }
---     , { id = 11, name = "Institutionalized", status = NotStarted }
---     ]
 
 
 type Message x a aa
@@ -111,36 +87,28 @@ filterQuests searchString quests =
         List.filter hasText quests
 
 
+search searchString =
+  div [ row, vcenter, margin 0 0 0 22, padding 0 0 3 0, style [
+    ("border-bottom", "1px solid #ccc")
+  ] ] [
+    input [
+      placeholder "Search for a quest", onInput Search, value searchString
+    , Input.input, height 30, size 20, color (rgb 85 85 85)
+    ] [ ]
+  , Icons.search 16 (rgb 204 204 204)
+  ]
+
+
 view model =
-    viewport
-        <| padding 10 0 0 0
-        <| hcenter
-        <| dim "800" "auto"
-        <| flowRight
-            [ toHtml <| Layout.space 40 25 0 0 <| Menu.view
-            , flowDown
-                [ padding 0 0 0 22
-                    <| borderBottom 1 "#ccc"
-                    <| padding 0 0 3 0
-                    <| flowRight
-                        [ Input.input
-                          |> Input.placeholder "Search for a quest"
-                          |> Input.value model.searchString
-                          |> Input.onInput Search
-                          |> Input.color (rgb 85 85 85)
-                          |> Input.size 20
-                          |> Input.height 30
-                          |> Input.toElement
-                        , vcenter <| toHtml <| Icons.search 16 (rgb 204 204 204)
-                        ]
-                , map QuestMessage <| padding 10 0 10 0 <| flowDown (List.map (toHtml << lazy Quest.view) (filterQuests model.searchString model.questStates))
-                ]
-            ]
-
-
-
--- border color width = fill color << padding width width width width
---
--- threePaddedRectangles = border "#f00" 10 << border "#0f0" 10 << border "#00f" 10
---
--- view model = text "Hello" |> center |> threePaddedRectangles |> threePaddedRectangles |> threePaddedRectangles |> viewport
+  let
+    filteredQuests = filterQuests model.searchString model.questStates
+  in
+    div [ row, padding 10 0 0 0, hcenter ] [
+      div [ row, width 800 ] [
+        div [ row, padding 40 25 0 0 ] [ Menu.view ]
+      , div [ column ] [
+          div [ row ] [ search model.searchString ]
+        , div [ column, padding 10 0 10 0 ] (List.map (map QuestMessage << Quest.view) filteredQuests)
+        ]
+      ]
+    ]
