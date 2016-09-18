@@ -10,7 +10,7 @@ import Styles.Flexbox exposing (row, column, vcenter, hcenter, width, height, ma
 import Styles.Text exposing (color, size, bold, line, LineType(..), LineStyle(..))
 
 import F4Tracker.Icons as Icons
-import F4Tracker.Models exposing (Quest, Status(..))
+import F4Tracker.Models exposing (Quest, Status(..), categoryName)
 
 type alias Model = {
   quest : Quest
@@ -53,7 +53,7 @@ view model =
     ] `List.append`
       statusSwitcher model.quest
     )
-    , div [ padding 2 0 0 22 ] [ span [ color (rgb 160 160 160), size 12 ] [ text model.quest.category ] ]
+    , div [ padding 2 0 0 22 ] [ span [ color (rgb 160 160 160), size 12 ] [ text (categoryName model.quest) ] ]
   ]
 
 
